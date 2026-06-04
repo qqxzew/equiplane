@@ -29,8 +29,20 @@ declare(strict_types=1);
             </nav>
         </div>
 
-        <div class="text-xs text-gray-500 border-t border-gray-800 pt-4">
-            Role: <span class="text-gray-300 font-medium">Admin</span>
+        <div class="text-sm text-gray-400 border-t border-gray-800 pt-4 space-y-1">
+            <?php if (isset($_SESSION['user_name'])): ?>
+                <div class="text-xs text-gray-500">User:</div>
+                <div class="text-white font-medium">
+                    <?= htmlspecialchars($_SESSION['user_name'], ENT_QUOTES, 'UTF-8'); ?>
+                </div>
+                <div class="text-xs text-orange-500 font-medium">
+                    <?= htmlspecialchars($_SESSION['user_role'], ENT_QUOTES, 'UTF-8'); ?>
+                </div>
+            <?php else: ?>
+                <a href="login.php" class="block text-center bg-orange-600 hover:bg-orange-500 text-white text-xs font-medium py-2 px-3 rounded-md transition">
+                    Sign In
+                </a>
+            <?php endif; ?>
         </div>
     </aside>
     <main class="flex-1 p-8">
