@@ -32,12 +32,16 @@ declare(strict_types=1);
         <div class="text-sm text-gray-400 border-t border-gray-800 pt-4 space-y-1">
             <?php if (isset($_SESSION['user_name'])): ?>
                 <div class="text-xs text-gray-500">User:</div>
-                <div class="text-white font-medium">
-                    <?= htmlspecialchars($_SESSION['user_name'], ENT_QUOTES, 'UTF-8'); ?>
+                    <div class="text-white font-medium">
+                        <?= htmlspecialchars($_SESSION['user_name'], ENT_QUOTES, 'UTF-8'); ?>
+                    </div>
+                    <div class="text-xs text-orange-500 font-medium">
+                        <?= htmlspecialchars($_SESSION['user_role'], ENT_QUOTES, 'UTF-8'); ?>
+                    </div>
                 </div>
-                <div class="text-xs text-orange-500 font-medium">
-                    <?= htmlspecialchars($_SESSION['user_role'], ENT_QUOTES, 'UTF-8'); ?>
-                </div>
+                <a href = "logout.php" class="block text-xs text-blue-400 hover:text-blue-300 transition font-medium pt-1">
+                    Log Out
+                </a>
             <?php else: ?>
                 <a href="login.php" class="block text-center bg-orange-600 hover:bg-orange-500 text-white text-xs font-medium py-2 px-3 rounded-md transition">
                     Sign In
