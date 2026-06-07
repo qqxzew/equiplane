@@ -3,6 +3,12 @@ declare(strict_types=1);
 
 session_start();
 
+if(!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'Admin'){
+    http_response_code(403);
+    echo "403 Acces Denied. You do not have permission to acces this page.";
+    exit();
+}
+
 require_once __DIR__ . "/../app/auth/check.php";
 
 require_once __DIR__ . "/../app/bootstrap.php";
