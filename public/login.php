@@ -12,10 +12,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    $smtpCheckUser = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-    $smtpCheckUser->execute([$email]);
+    $stmtCheckUser = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+    $stmtCheckUser->execute([$email]);
 
-    $user = $smtpCheckUser->fetch();
+    $user = $stmtCheckUser->fetch();
 
     if($user && password_verify($password, $user['password_hash']) === true){
         $_SESSION['user_id'] = $user['id'];

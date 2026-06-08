@@ -17,15 +17,23 @@ declare(strict_types=1);
             </div>
 
             <nav class="space-y-2">
-                <a href="#" class="block px-4 py-2.5 rounded-lg bg-gray-800 text-white font-medium transition">
-                    Dashboard
-                </a>
-                <a fref="#" class="block px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
-                    Applications
-                </a>
-                <a href="#" class="block px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
-                    Equipment
-                </a>
+                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'Admin'): ?>
+                    <a href="index.php" class="block px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                        Dashboard
+                    </a>
+                <?php endif; ?>
+
+                <?php if (isset($_SESSION['user_role'])): ?>
+                    <a href="tickets.php" class="block px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                        Applications
+                    </a>
+                <?php endif; ?>
+
+                <?php if (isset($_SESSION['user_role']) && ($_SESSION['user_role'] === 'Admin' || $_SESSION['user_role'] === 'Engineer')): ?>
+                    <a href="#" class="block px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                        Equipment
+                    </a>
+                <?php endif; ?>
             </nav>
         </div>
 

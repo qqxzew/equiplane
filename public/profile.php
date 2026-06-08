@@ -10,9 +10,9 @@ require_once __DIR__ .'/../app/database/db.php';
 $success = '';
 $error = '';
 
-$smtp = $pdo->prepare("SELECT name, email, role, password_hash FROM users WHERE id = ?");
-$smtp->execute([$_SESSION['user_id']]);
-$user = $smtp->fetch();
+$stmt = $pdo->prepare("SELECT name, email, role, password_hash FROM users WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$user = $stmt->fetch();
 
 if (!$user){
     echo "User not found.";
@@ -33,8 +33,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     }
     else{
         $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
-        $smtp = $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?');
-        $smtp->execute([$newHash, $_SESSION['user_id']]);  
+        $stmt = $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?');
+        $stmt->execute([$newHash, $_SESSION['user_id']]);  
         $success = "Password updated.";
     }
 }
