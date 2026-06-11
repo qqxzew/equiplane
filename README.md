@@ -3,3 +3,4 @@ Industrial maintenance ticketing system for managing equipment failures, enginee
 
 
 
+php -S localhost:8000 -t public
