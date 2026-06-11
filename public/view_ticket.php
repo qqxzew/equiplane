@@ -34,6 +34,22 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && $role === 'Engineer' && isset($_POST
         $stmtLog = $pdo->prepare("INSERT INTO ticket_logs (ticket_id, action_text) VALUES(?, ?)");
         $stmtLog->execute([$ticketId, "Engineer resolved and closed the ticket."]);
     }
+    elseif($action === 'backup'){
+        $backupReason = trim($_POST['backup_reason'] ?? '');
+        if(empty($backupReason)){
+            $error = "Pls provide a reason for help :O";
+        }
+        else{
+            $stmtStatus = $pdo->prepare("UPDATE tickets SET status = 'backup_required' WHERE id =?");
+            $stmtStatus->execute([$ticketId]);
+
+            $stmtLog = $pdo->prepare("INSERT INTO ticket_logs (ticket_id, action_text) VALUES (?, ?)");
+            $stmtLog->execute([$ticketId, "Engine want a help, reason" . $backupReason]);
+
+            header("Location: view_ticket.php?id=". $ticketId);
+            exit();
+        }
+    }
     
     header("Location: view_ticket.php?id=" . $ticketId);
     exit();
@@ -56,6 +72,47 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && $role === 'Admin' && isset($_POST['a
     header("Location: view_ticket.php?id=" . $ticketId);
     exit();
    }
+}
+
+if($_SERVER['REQUEST_METHOD'] === 'POST' && $role === 'Admin' && isset($_POST['admin_backup_decision'])){
+    $decision = $_POST['admin_backup_decision'];
+
+    if($decision === 'approve'){
+        $stmtStatus = $pdo->prepare("UPDATE tickets SET status = 'in_progress' WHERE id = ?");
+        $smtmStatus->execute([$ticketId]);
+
+        $smtmLog = $pdo->prepare("INSERT INTO ticket_logs (ticket_id, action_text) VALUES (?, ?)");
+        $stmtLog->execute([$ticketId, "Admin APPROVED pls help request. We are going to you..."]);
+    }
+
+    elseif($decision === 'reject'){
+        $smtmStatus = $pdo->prepare("UPDATE tickets SET status = 'in_progress' WHERE id = ?");
+        $stmtStatus->execute([$ticketId]);
+
+        $stmtLog = $pdo->preapare("INSERT INTO ticket_logs (ticekt_id, action_text) VALUES (?, ?)");
+        $stmtLog->execute([$ticektId, "W O R K"]);
+    }
+    header("Location: view_ticket.php?id=". $ticketId);
+    exit();
+}
+
+if($_SERVER['REQUEST_METHOD'] === 'POST' && $role === 'Admin' && isset($_POST['assign_engineer'])){
+    $engineerId = (int)$_POST['engineer_id'];
+
+    if($engineerId > 0){
+        $stmtUpdate = $pdo->prepare("UPDATE tickets SET engineer_id = / WHERE id = ?");
+        $stmtUpdate->execute([$engineerId, $ticketId]);
+
+        $stmtEngName = $pdo->prepare("SELECT name FROM users WHERE id = ?");
+        $stmtEngName->execute([$engineerId]);
+        $engineerName = $stmtEngName->fetchColumn();
+
+        $stmtLog = $pdo->prepare("INSERT INTO ticket_logs (ticekt_id, action_text) VALUES (?, ?)");
+        $stmtLog->execute([$tickettId, "Admin Assigned engineer: " . $engineerName]);
+
+        header("Location: view_ticket.php?id=" . $ticketId);
+        exit();
+    }
 }
 //upd
 $stmt = $pdo->prepare("
@@ -88,7 +145,7 @@ if($role === 'Client' && (int)$ticket['client_id'] !== $userId){
 $engineers = [];
 if($role === 'Admin'){
     $stmtEng = $pdo->query("SELECT id, name FROM users WHERE role = 'Engineer' ORDER BY name ASC");
-    $engineers = $stmtEng->fetchall();
+    $engineers = $stmtEng->fetchAll();
 }
 
 $stmtLogs = $pdo->prepare("SELECT action_text, created_at FROM ticket_logs WHERE ticket_id = ? ORDER BY created_at DESC");
@@ -105,10 +162,18 @@ require_once __DIR__ . '/../views/header.php';
         <?= htmlspecialchars($ticket['subject'], ENT_QUOTES, 'UTF-8') ?> (#<?= $ticket['id'] ?>)
     </h1>
 
+    <?php if (!empty($error)): ?>
+        <div class="bg-red-500/10 border border-red-500/20 text-red-400 text-xs p-3 rounded mt-4">
+            <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
+        </div>
+    <?php endif; ?>
+
     <div class="mt-6 space-y-4 text-sm">
         <div>
             <span class="text-gray-500">Status:</span>
-            <span class="text-white font-medium ml-1"><?= ucfirst($ticket['status']) ?></span>
+            <span class="<?= $ticket['status'] === 'backup_required' ? 'text-red-500 font-bold' : 'text-white font-medium' ?> ml-1">
+                <?= str_replace('_', ' ', ucfirst($ticket['status'])) ?>
+            </span>
         </div>
 
         <div>
@@ -139,21 +204,72 @@ require_once __DIR__ . '/../views/header.php';
             </span>
         </div>
 
+        <?php if ($ticket['status'] === 'closed'): ?>
+            <div class="border-t border-gray-800 pt-4 mt-4 text-xs space-y-1">
+                <div><span class="text-gray-500">Hours spent:</span> <span class="text-white font-mono"><?= $ticket['hours_spent'] ?> h</span></div>
+                <div><span class="text-gray-500">Parts cost:</span> <span class="text-white font-mono"><?= $ticket['cost_of_parts'] ?> Kč</span></div>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($role === 'Admin' && $ticket['status'] === 'backup_required'): ?>
+            <div class="border border-red-500/20 bg-red-500/5 p-4 rounded-lg mt-4 space-y-3">
+                <span class="block text-xs font-bold text-red-400 uppercase tracking-wider">🚨 Backup Request Pending Approval</span>
+                
+                <form action="view_ticket.php?id=<?= $ticketId ?>" method="POST" class="flex gap-2">
+                    <button type="submit" name="admin_backup_decision" value="approve" class="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1.5 rounded transition font-medium">
+                        Accept & Add Engineers
+                    </button>
+                    <button type="submit" name="admin_backup_decision" value="reject" class="bg-gray-800 hover:bg-gray-700 text-gray-400 text-xs px-3 py-1.5 rounded transition font-medium">
+                        Reject Request
+                    </button>
+                </form>
+            </div>
+        <?php endif; ?>
+
         <?php if ($role === 'Engineer' && (int)$ticket['engineer_id'] === $userId): ?>
             <div class="border-t border-gray-800 pt-4 mt-4">
-                <form action="view_ticket.php?id=<?= $ticketId ?>" method="POST" class="flex gap-3">
-                    <?php if ($ticket['status'] === 'new'): ?>
+                <?php if ($ticket['status'] === 'new'): ?>
+                    <form action="view_ticket.php?id=<?= $ticketId ?>" method="POST">
                         <button type="submit" name="ticket_action" value="start" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-4 py-2 rounded transition font-medium">
                             Start Work
                         </button>
-                    <?php endif; ?>
+                    </form>
+                <?php endif; ?>
 
-                    <?php if ($ticket['status'] === 'in_progress'): ?>
-                        <button type="submit" name="ticket_action" value="resolve" class="bg-green-600 hover:bg-green-500 text-white text-xs px-4 py-2 rounded transition font-medium">
-                            Resolve Ticket
-                        </button>
-                    <?php endif; ?>
-                </form>
+                <?php if ($ticket['status'] === 'in_progress' || $ticket['status'] === 'backup_required'): ?>
+                    <div class="space-y-4 max-w-xs">
+                        
+                        <?php if ($ticket['status'] === 'in_progress'): ?>
+                            <form action="view_ticket.php?id=<?= $ticketId ?>" method="POST" class="border-b border-gray-800 pb-4 space-y-2">
+                                <label for="backup_reason" class="block text-xs text-gray-400 font-medium">Specify Backup Reason:</label>
+                                <input type="text" name="backup_reason" id="backup_reason" required placeholder="e.g. Need second person for heavy lifting"
+                                       class="w-full bg-gray-950 border border-gray-800 rounded px-2.5 py-1.5 text-white text-xs focus:outline-none">
+                                <button type="submit" name="ticket_action" value="backup" class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded transition font-medium">
+                                    🚨 Request Backup
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                        <form action="view_ticket.php?id=<?= $ticketId ?>" method="POST" class="space-y-3 pt-2">
+                            <span class="block text-xs text-gray-400 font-medium">Report Resources Before Closing:</span>
+                            <div>
+                                <label for="hours_spent" class="block text-xs text-gray-500 mb-1">Hours spent:</label>
+                                <input type="number" step="0.1" name="hours_spent" id="hours_spent" required min="0" placeholder="e.g. 2.5"
+                                       class="w-full bg-gray-950 border border-gray-800 rounded px-2.5 py-1.5 text-white text-xs focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label for="cost_of_parts" class="block text-xs text-gray-500 mb-1">Parts cost (Kč):</label>
+                                <input type="number" step="1" name="cost_of_parts" id="cost_of_parts" required min="0" placeholder="e.g. 1500"
+                                       class="w-full bg-gray-950 border border-gray-800 rounded px-2.5 py-1.5 text-white text-xs focus:outline-none">
+                            </div>
+
+                            <button type="submit" name="ticket_action" value="resolve" class="bg-green-600 hover:bg-green-500 text-white text-xs px-4 py-2 rounded transition font-medium">
+                                Resolve and Close Ticket
+                            </button>
+                        </form>
+                    </div>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
 
@@ -195,6 +311,4 @@ require_once __DIR__ . '/../views/header.php';
     </div>
 </div>
 
-<?php 
-require_once __DIR__ . '/../views/footer.php'; 
-?>
+<?php require_once __DIR__ . '/../views/footer.php'; ?>
