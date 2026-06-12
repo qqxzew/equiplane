@@ -223,3 +223,91 @@ require_once __DIR__ . '/../views/header.php';
                     </button>
                 </form>
             </div>
+        <?php endif; ?>
+
+        <?php if ($role === 'Engineer' && (int)$ticket['engineer_id'] === $userId): ?>
+            <div class="border-t border-gray-800 pt-4 mt-4">
+                <?php if ($ticket['status'] === 'new'): ?>
+                    <form action="view_ticket.php?id=<?= $ticketId ?>" method="POST">
+                        <button type="submit" name="ticket_action" value="start" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-4 py-2 rounded transition font-medium">
+                            Start Work
+                        </button>
+                    </form>
+                <?php endif; ?>
+
+                <?php if ($ticket['status'] === 'in_progress' || $ticket['status'] === 'backup_required'): ?>
+                    <div class="space-y-4 max-w-xs">
+                        
+                        <?php if ($ticket['status'] === 'in_progress'): ?>
+                            <form action="view_ticket.php?id=<?= $ticketId ?>" method="POST" class="border-b border-gray-800 pb-4 space-y-2">
+                                <label for="backup_reason" class="block text-xs text-gray-400 font-medium">Specify Backup Reason:</label>
+                                <input type="text" name="backup_reason" id="backup_reason" required placeholder="e.g. Need second person for heavy lifting"
+                                       class="w-full bg-gray-950 border border-gray-800 rounded px-2.5 py-1.5 text-white text-xs focus:outline-none">
+                                <button type="submit" name="ticket_action" value="backup" class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded transition font-medium">
+                                    🚨 Request Backup
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                        <form action="view_ticket.php?id=<?= $ticketId ?>" method="POST" class="space-y-3 pt-2">
+                            <span class="block text-xs text-gray-400 font-medium">Report Resources Before Closing:</span>
+                            <div>
+                                <label for="hours_spent" class="block text-xs text-gray-500 mb-1">Hours spent:</label>
+                                <input type="number" step="0.1" name="hours_spent" id="hours_spent" required min="0" placeholder="e.g. 2.5"
+                                       class="w-full bg-gray-950 border border-gray-800 rounded px-2.5 py-1.5 text-white text-xs focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label for="cost_of_parts" class="block text-xs text-gray-500 mb-1">Parts cost (Kč):</label>
+                                <input type="number" step="1" name="cost_of_parts" id="cost_of_parts" required min="0" placeholder="e.g. 1500"
+                                       class="w-full bg-gray-950 border border-gray-800 rounded px-2.5 py-1.5 text-white text-xs focus:outline-none">
+                            </div>
+
+                            <button type="submit" name="ticket_action" value="resolve" class="bg-green-600 hover:bg-green-500 text-white text-xs px-4 py-2 rounded transition font-medium">
+                                Resolve and Close Ticket
+                            </button>
+                        </form>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($role === 'Admin'): ?>
+            <div class="border-t border-gray-800 pt-4 mt-4">
+                <form action="view_ticket.php?id=<?= $ticketId ?>" method="POST" class="space-y-2">
+                    <label for="engineer_id" class="block text-xs text-gray-400">Assign or Change Engineer:</label>
+                    <div class="flex gap-2">
+                        <select name="engineer_id" id="engineer_id" required class="bg-gray-950 border border-gray-800 rounded px-3 py-1.5 text-white focus:outline-none text-xs">
+                            <option value="">-- Select Engineer --</option>
+                            <?php foreach ($engineers as $eng): ?>
+                                <option value="<?= $eng['id'] ?>" <?= ((int)$ticket['engineer_id'] === (int)$eng['id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($eng['name'], ENT_QUOTES, 'UTF-8') ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <button type="submit" name="assign_engineer" class="bg-orange-600 hover:bg-orange-500 text-white text-xs px-4 py-1.5 rounded transition">
+                            Assign
+                        </button>
+                    </div>
+                </form>
+            </div>
+        <?php endif; ?>
+
+        <div class="border-t border-gray-800 pt-4">
+            <span class="text-xs text-gray-400 block mb-1">Detailed Description:</span>
+            <p class="text-gray-300 whitespace-pre-wrap leading-relaxed"><?= htmlspecialchars($ticket['description'], ENT_QUOTES, 'UTF-8') ?></p>
+        </div>
+
+        <div class="border-t border-gray-800 pt-4">
+            <span class="text-xs text-gray-400 block mb-2">Application History Logs:</span>
+            <div class="space-y-1 text-xs font-mono text-gray-500">
+                <div>[<?= date('d.m.Y H:i', strtotime($ticket['created_at'])) ?>] Ticket created by client.</div>
+                <?php foreach ($logs as $log): ?>
+                    <div>[<?= date('d.m.Y H:i', strtotime($log['created_at'])) ?>] <?= htmlspecialchars($log['action_text'], ENT_QUOTES, 'UTF-8') ?></div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php require_once __DIR__ . '/../views/footer.php'; ?>

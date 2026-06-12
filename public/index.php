@@ -37,12 +37,18 @@ foreach($closedTicketsData as $row){
 require_once __DIR__ . "/../views/header.php";
 ?>
 
-<div class="max-w-5xl">
-    <h1 class="text-2xl font-bold mb-2">Control panel</h1>
-    <p class="text-gray-400 mb-8">Industrial maintenance ticketing system</p>
+<div class="max-w-5xl space-y-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold mb-2">Control panel</h1>
+            <p class="text-gray-400">Industrial maintenance ticketing system</p>
+        </div>
+        <a href="export.php" class="bg-green-600 hover:bg-green-500 text-white text-xs font-medium py-2.5 px-5 rounded-lg transition shadow-lg">
+            Export Financial Report (CSV)
+        </a>
+    </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
         <div class="bg-gray-900 p-6 rounded-xl border border-gray-800">
             <div class="text-sm text-gray-400 mb-1">Active accidents</div>
             <div class="text-3xl font-bold text-orange-500"><?= $activeTickets ?></div>
@@ -57,7 +63,6 @@ require_once __DIR__ . "/../views/header.php";
             <div class="text-sm text-gray-400 mb-1">Total Revenue (w/o VAT)</div>
             <div class="text-3xl font-bold text-green-500"><?= number_format($totalRevenue, 2, '.', ' ') ?> Kč</div>
         </div>
-
     </div>
 </div>
 
