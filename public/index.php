@@ -14,6 +14,26 @@ require_once __DIR__ . "/../app/auth/check.php";
 require_once __DIR__ . "/../app/bootstrap.php";
 require_once __DIR__ . "/../app/database/db.php";
 
+$stmtActive = $pdo->query("SELECT COUNT(*) FROM tickets WHERE status IN ('new', 'in_progress', 'backup_required')");
+$activeTickets = $stmtActive->fetchColumn();
+
+$stmtEngineers = $pdo->query("SELECT COUNT(DISTINCT engineer_id) FROM tickets WHERE status IN('in_progress', 'backup_required') AND engineer_id IS NOT NULL");
+$activeEngineers = $stmtEngineers->fetchColumn();
+
+$stmtRevenue = $pdo->query("SELECT hours_spent, cost_of_parts FROM tickets WHERE status = 'closed'");
+$closedTicketsData = $stmtRevenue->fetchAll();
+
+#$stmtHourlyRate = $pdo->query("SELECT salary FROM users WHERE status IN('in_progress', 'backup_required') AND engineer_id IS NOT NULL");
+#$stmtActiveEngHourlyRate = $stmtHourlyRate->fetchAll();
+#$hourlyRate = $stmtActiveEngHourlyRate;
+
+$totalRevenue = 0.0;
+$hourlyRate = 600;
+
+foreach($closedTicketsData as $row){
+    $totalRevenue += ((float)$row['hours_spent'] * $hourlyRate) + (float)$row['cost_of_parts'];
+}
+
 require_once __DIR__ . "/../views/header.php";
 ?>
 
@@ -23,25 +43,19 @@ require_once __DIR__ . "/../views/header.php";
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <div class="bg gray-900 p-6 rounded-xl border bordere-gray-800">
-            <div class="text-sm text-gray-400">Active accidents</div>
-            <div class="text-3xl font-bold text-orange-500">0</div>
-        </div>
-
-        <div class="bg-gray-900 p-6 rounded-xl border norder-gray-800">
-            <div class="text-sm text-gray-400 mb-1">Engeneers at the object</div>
-            <div class="text-3xl font-bold text-blue-500">0</div>
+        <div class="bg-gray-900 p-6 rounded-xl border border-gray-800">
+            <div class="text-sm text-gray-400 mb-1">Active accidents</div>
+            <div class="text-3xl font-bold text-orange-500"><?= $activeTickets ?></div>
         </div>
 
         <div class="bg-gray-900 p-6 rounded-xl border border-gray-800">
-            <div class="text-sm text-gray-400 mb-1">Database status</div>
-            <div class="text-sm font-semibold mt-2">
-                <?php if (isset($pdo)): ?>
-                    <span class="text-green-500 bg-green-500/10 px-2 py-1 rounded">Active</span>
-                <?php else: ?>
-                    <span class="text-red-500 bg-red-500/10 px-2 py-1 rounded">Inactive</span>
-                <?php endif; ?>
-            </div>
+            <div class="text-sm text-gray-400 mb-1">Engineers at the object</div>
+            <div class="text-3xl font-bold text-blue-500"><?= $activeEngineers ?></div>
+        </div>
+
+        <div class="bg-gray-900 p-6 rounded-xl border border-gray-800">
+            <div class="text-sm text-gray-400 mb-1">Total Revenue (w/o VAT)</div>
+            <div class="text-3xl font-bold text-green-500"><?= number_format($totalRevenue, 2, '.', ' ') ?> Kč</div>
         </div>
 
     </div>
