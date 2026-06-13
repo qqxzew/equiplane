@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-
+/** @var PDO $pdo */
 session_start();
 
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'Admin') {

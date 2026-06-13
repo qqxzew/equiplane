@@ -1,6 +1,6 @@
 <?php
 declare(strict_types= 1);
-
+/** @var PDO $pdo */
 session_start();
 
 require_once __DIR__ . '/../app/auth/check.php';

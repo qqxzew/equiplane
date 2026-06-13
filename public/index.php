@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
-
+/** @var PDO $pdo */
 session_start();
 
 if(!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'Admin'){
     http_response_code(403);
-    echo "403 Acces Denied. You do not have permission to acces this page.";
+    echo "403 Access Denied. You do not have permission to access this page.";
     exit();
 }
 

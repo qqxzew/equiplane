@@ -18,3 +18,13 @@ if (file_exists($envPath)){
     }
 
 }
+
+
+function logSystemError(string $message): void{
+    $logPath = __DIR__ . '/error.log';
+    $timestamp = date('Y/m/d H:i:s');
+    $logEntry = "[{$timestamp}] {$message}" . PHP_EOL;
+    file_put_contents($logPath, $logEntry, FILE_APPEND);
+}
+
+require_once __DIR__ . '/helpers.php';

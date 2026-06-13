@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../bootstrap.php';
 require_once __DIR__ . '/db.php';
+/** @var PDO $pdo */
 
 $hashAdmin = password_hash('admin', PASSWORD_DEFAULT);
 $hashEngineer = password_hash('engineer', PASSWORD_DEFAULT);
