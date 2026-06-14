@@ -32,7 +32,7 @@ declare(strict_types=1);
             <?php endif; ?>
 
             <?php if (isset($_SESSION['user_role']) && ($_SESSION['user_role'] === 'Admin' || $_SESSION['user_role'] === 'Engineer')): ?>
-                <a href="#"
+                <a href="../public/equipment.php"
                    class="block px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
                     Equipment
                 </a>

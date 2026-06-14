@@ -4,8 +4,7 @@ declare(strict_types=1);
 session_start();
 
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'Admin') {
-    http_response_code(403);
-    echo "403 Access Denied.";
+    header('Location: tickets.php');
     exit();
 }
 
@@ -37,7 +36,7 @@ header('Content-Disposition: attachment; filename="' . $filename . '"');
 
 $output = fopen('php://output', 'w');
 
-fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
 fputcsv($output, ['Ticket ID', 'Subject', 'Equipment', 'Client Company', 'Hours Spent', 'Parts Cost (Kč)', 'Created At']);
 

@@ -9,6 +9,13 @@ require_once __DIR__ . "/../app/database/db.php";
 $error = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrfToken = $_SESSION['csrf_token'] ?? '';
+
+    if (!verifyCsrfToken($csrfToken)) {
+        setFlash('error', 'Invalid CSRF token.');
+        header('Location: login.php');
+        exit();
+    }
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
@@ -22,10 +29,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_role'] = $user['role'];
         $_SESSION['user_name'] = $user['name'];
 
-        header('Location: index.php');
+
+        if ($user['role'] === 'Admin') {
+            header('Location: index.php');
+        } else {
+            header('Location: tickets.php');
+        }
         exit();
     } else {
-        $error = "Invalid email or password.";
+        setFlash('error', 'Invalid email or password.');
+        header('Location: login.php');
+        exit();
     }
 }
 ?>
@@ -45,13 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="text-sm text-gray-400">Industrial maintenance ticketing system</p>
     </div>
 
-    <?php if (!empty($error)): ?>
-        <div class="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-lg mb-6">
-            <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
-        </div>
-    <?php endif; ?>
+    <?= displayFlash() ?>
 
     <form action="login.php" method="POST" class="space-y-6">
+        <input type="hidden" name="csrf_token"
+               value="<?= htmlspecialchars(generateCsrfToken(), ENT_QUOTES, 'UTF-8') ?>">
+
         <div>
             <label for="email" class="block text-sm font-medium text-gray-400 mb-2">Email</label>
             <input type="email" name="email" id="email" required

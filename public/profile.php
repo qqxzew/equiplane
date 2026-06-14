@@ -7,51 +7,50 @@ require_once __DIR__ . '/../app/auth/check.php';
 require_once __DIR__ . '/../app/bootstrap.php';
 require_once __DIR__ . '/../app/database/db.php';
 
-$success = '';
-$error = '';
-
 $stmt = $pdo->prepare("SELECT name, email, role, password_hash FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
 if (!$user) {
-    echo "User not found.";
+    header('Location: login.php');
     exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $oldPassword = trim($_POST['old_password']);
-    $newPassword = trim($_POST['new_password']);
+    $csrfToken = $_POST['csrf_token'] ?? '';
+    if (!verifyCsrfToken($csrfToken)) {
+        setFlash('error', 'Security token expired. Please try again.');
+        header('Location: profile.php');
+        exit();
+    }
+
+    $oldPassword = trim($_POST['old_password'] ?? '');
+    $newPassword = trim($_POST['new_password'] ?? '');
+
     if (!password_verify($oldPassword, $user['password_hash'])) {
-        $error = "Password is wrong";
+        setFlash('error', 'Current password is wrong.');
     } elseif ($newPassword === $oldPassword) {
-        $error = "New password can be same as an old password.";
-    } elseif ($newPassword == '' || strlen($newPassword) < 8) {
-        $error = 'Password must contain 8 symbols';
+        setFlash('error', 'New password cannot be the same as the old password.');
+    } elseif (strlen($newPassword) < 8) {
+        setFlash('error', 'Password must contain at least 8 characters.');
     } else {
         $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?');
         $stmt->execute([$newHash, $_SESSION['user_id']]);
-        $success = "Password updated.";
+        setFlash('success', 'Password successfully updated.');
     }
+
+    header('Location: profile.php');
+    exit();
 }
+
 require_once __DIR__ . '/../views/header.php';
 ?>
 
     <div class="max-w-2xl bg-gray-900 border border-gray-800 rounded-2xl p-8 shadow-xl">
         <h1 class="text-2xl font-bold tracking-wider text-orange-500 mb-6">User Profile</h1>
 
-        <?php if (!empty($error)): ?>
-            <div class="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-lg mb-6">
-                <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if (!empty($success)): ?>
-            <div class="bg-green-500/10 border border-green-500/20 text-green-400 text-sm p-4 rounded-lg mb-6">
-                <?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?>
-            </div>
-        <?php endif; ?>
+        <?= displayFlash() ?>
 
         <div class="grid grid-cols-2 gap-6 mb-8 border-b border-gray-800 pb-6">
             <div>
@@ -69,6 +68,9 @@ require_once __DIR__ . '/../views/header.php';
         </div>
 
         <form action="profile.php" method="POST" class="space-y-6">
+            <input type="hidden" name="csrf_token"
+                   value="<?= htmlspecialchars(generateCsrfToken(), ENT_QUOTES, 'UTF-8') ?>">
+
             <h2 class="text-lg font-semibold text-white">Change Password</h2>
 
             <div class="grid grid-cols-2 gap-4">
@@ -92,6 +94,4 @@ require_once __DIR__ . '/../views/header.php';
         </form>
     </div>
 
-<?php
-require_once __DIR__ . '/../views/footer.php';
-?>
+<?php require_once __DIR__ . '/../views/footer.php'; ?>
