@@ -41,9 +41,9 @@ function displayFlash(): string
     $flash = $_SESSION['flash'];
     unset($_SESSION['flash']);
 
-    $colorClass = $flash['type'] === ' success'
-        ? 'bg-green-100 text-green-800'
-        : 'bg-red-100 text-red-800';
+    $colorClass = $flash['type'] === 'success'
+        ? 'bg-green-500/10 border-green-500/20 text-green-400'
+        : 'bg-red-500/10 border-red-500/20 text-red-400';
 
     return "<div class=\"border {$colorClass} text-sm p-4 rounded-lg mb-6\">"
         . htmlspecialchars($flash['message'], ENT_QUOTES, 'UTF-8')

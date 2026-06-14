@@ -9,7 +9,7 @@ require_once __DIR__ . "/../app/database/db.php";
 $error = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $csrfToken = $_SESSION['csrf_token'] ?? '';
+    $csrfToken = $_POST['csrf_token'] ?? '';
 
     if (!verifyCsrfToken($csrfToken)) {
         setFlash('error', 'Invalid CSRF token.');

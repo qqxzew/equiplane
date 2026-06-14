@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 ?>
-    </main>
+<!--suppress HtmlUnknownTag, HtmlWrongAttributeValue, HtmlExtraClosingTag -->
+</main>
+</div>
 </body>
 </html>

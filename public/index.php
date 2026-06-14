@@ -9,7 +9,6 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'Admin') {
 }
 
 require_once __DIR__ . "/../app/auth/check.php";
-
 require_once __DIR__ . "/../app/bootstrap.php";
 require_once __DIR__ . "/../app/database/db.php";
 
@@ -19,53 +18,68 @@ $activeTickets = $stmtActive->fetchColumn();
 $stmtEngineers = $pdo->query("SELECT COUNT(DISTINCT engineer_id) FROM tickets WHERE status IN('in_progress', 'backup_required') AND engineer_id IS NOT NULL");
 $activeEngineers = $stmtEngineers->fetchColumn();
 
-$stmtRevenue = $pdo->query("SELECT hours_spent, cost_of_parts FROM tickets WHERE status = 'closed'");
+$stmtRevenue = $pdo->query("
+    SELECT t.hours_spent, t.cost_of_parts, u.hourly_rate 
+    FROM tickets t 
+    JOIN users u ON t.engineer_id = u.id 
+    WHERE t.status = 'closed'
+");
 $closedTicketsData = $stmtRevenue->fetchAll();
 
-#$stmtHourlyRate = $pdo->query("SELECT salary FROM users WHERE status IN('in_progress', 'backup_required') AND engineer_id IS NOT NULL");
-#$stmtActiveEngHourlyRate = $stmtHourlyRate->fetchAll();
-#$hourlyRate = $stmtActiveEngHourlyRate;
-
 $totalRevenue = 0.0;
-$hourlyRate = 600;
 
 foreach ($closedTicketsData as $row) {
-    $totalRevenue += ((float)$row['hours_spent'] * $hourlyRate) + (float)$row['cost_of_parts'];
+    $rate = (float)$row['hourly_rate'];
+    $totalRevenue += ((float)$row['hours_spent'] * $rate) + (float)$row['cost_of_parts'];
 }
 
 require_once __DIR__ . "/../views/header.php";
 ?>
 
-    <div class="max-w-5xl space-y-6">
+    <div class="space-y-6">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold mb-2">Control panel</h1>
-                <p class="text-gray-400">Industrial maintenance ticketing system</p>
+                <h1 class="text-xl font-semibold text-white flex items-center gap-2">
+                    <i class="ph ph-squares-four text-orange-500"></i> Dashboard
+                </h1>
             </div>
             <a href="export.php"
-               class="bg-green-600 hover:bg-green-500 text-white text-xs font-medium py-2.5 px-5 rounded-lg transition shadow-lg">
-                Export Financial Report (CSV)
+               class="bg-gray-800 hover:bg-gray-700 text-white text-xs font-medium py-2 px-4 rounded transition border border-gray-700 flex items-center gap-2">
+                <i class="ph ph-download-simple"></i> Export CSV
             </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-gray-900 p-6 rounded-xl border border-gray-800">
-                <div class="text-sm text-gray-400 mb-1">Active accidents</div>
-                <div class="text-3xl font-bold text-orange-500"><?= $activeTickets ?></div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-gray-900 p-5 rounded-lg border border-gray-800 flex items-center gap-4">
+                <div class="p-3 bg-orange-500/10 text-orange-500 rounded-lg">
+                    <i class="ph ph-warning-circle text-2xl"></i>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Active Alerts</div>
+                    <div class="text-2xl font-bold text-white"><?= $activeTickets ?></div>
+                </div>
             </div>
 
-            <div class="bg-gray-900 p-6 rounded-xl border border-gray-800">
-                <div class="text-sm text-gray-400 mb-1">Engineers at the object</div>
-                <div class="text-3xl font-bold text-blue-500"><?= $activeEngineers ?></div>
+            <div class="bg-gray-900 p-5 rounded-lg border border-gray-800 flex items-center gap-4">
+                <div class="p-3 bg-blue-500/10 text-blue-500 rounded-lg">
+                    <i class="ph ph-users text-2xl"></i>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Field Engineers</div>
+                    <div class="text-2xl font-bold text-white"><?= $activeEngineers ?></div>
+                </div>
             </div>
 
-            <div class="bg-gray-900 p-6 rounded-xl border border-gray-800">
-                <div class="text-sm text-gray-400 mb-1">Total Revenue (w/o VAT)</div>
-                <div class="text-3xl font-bold text-green-500"><?= number_format($totalRevenue, 2, '.', ' ') ?> Kč</div>
+            <div class="bg-gray-900 p-5 rounded-lg border border-gray-800 flex items-center gap-4">
+                <div class="p-3 bg-green-500/10 text-green-500 rounded-lg">
+                    <i class="ph ph-currency-circle-dollar text-2xl"></i>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Revenue (w/o VAT)</div>
+                    <div class="text-2xl font-bold text-white"><?= number_format($totalRevenue, 2, '.', ' ') ?> Kč</div>
+                </div>
             </div>
         </div>
     </div>
 
-<?php
-require_once __DIR__ . "/../views/footer.php";
-?>
+<?php require_once __DIR__ . "/../views/footer.php"; ?>

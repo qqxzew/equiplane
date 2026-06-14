@@ -17,15 +17,15 @@ $stmtCompany->execute(['ŠKODA TRANSPORTATION a.s.', 'Emila Škody 2922/1, Jižn
 $idSkoda = $pdo->lastInsertId();
 
 
-$stmtUser = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
-$stmtUser->execute(["Admin", "admin@gmail.com", $hashAdmin, "Admin"]);
-$stmtUser->execute(["Engineer1", "engineer1@gmail.com", $hashEngineer, "Engineer"]);
-$stmtUser->execute(["Engineer2", "engineer2@gmail.com", $hashEngineer, "Engineer"]);
-$stmtUser->execute(["Client", "windowsclient@gmail.com", $hashClient, "Client"]);
+$stmtUser = $pdo->prepare("INSERT INTO users (name, email, password_hash, role, hourly_rate) VALUES (?, ?, ?, ?, ?)");
+$stmtUser->execute(["Admin", "admin@gmail.com", $hashAdmin, "Admin", 0]);
+$stmtUser->execute(["Engineer1", "engineer1@gmail.com", $hashEngineer, "Engineer", 600]);
+$stmtUser->execute(["Engineer2", "engineer2@gmail.com", $hashEngineer, "Engineer", 850]);
+$stmtUser->execute(["Client", "windowsclient@gmail.com", $hashClient, "Client", 0]);
 $stmtUser = $pdo->lastInsertId();
 
 
-$stmtEquipment =$pdo->prepare("INSERT INTO equipment (company_id, name, serial_number) VALUES (?, ?, ?)");
+$stmtEquipment = $pdo->prepare("INSERT INTO equipment (company_id, name, serial_number) VALUES (?, ?, ?)");
 $stmtEquipment->execute([$idRTSoft, "White Icecream car", "965986564"]);
 $stmtEquipment->execute([$idSitPort, "Black Icecream car", "324234424"]);
 $stmtEquipment->execute([$idSkoda, "Orange Icecream car", "654867436"]);
