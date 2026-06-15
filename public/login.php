@@ -2,7 +2,8 @@
 declare(strict_types=1);
 /** @var PDO $pdo */
 session_start();
-
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 require_once __DIR__ . "/../app/bootstrap.php";
 require_once __DIR__ . "/../app/database/db.php";
 
