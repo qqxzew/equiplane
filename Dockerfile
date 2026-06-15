@@ -8,4 +8,4 @@ COPY . /app
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8000} -t public"]
+CMD ["sh", "-c", "php -S 0.0.0.0:8000 -t public"]
