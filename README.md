@@ -98,7 +98,7 @@ The financial dashboard calculates service revenue based on:
 The administrator can view all applications, filter tickets by status and priority, see assigned engineers, and manage
 the maintenance workflow.
 
-![Admin dashboard](docs/admin.png)
+![Admin dashboard](engineer/admin.png)
 
 ---
 
@@ -106,7 +106,7 @@ the maintenance workflow.
 
 The client can view their profile, access only their own company’s data, and manage their maintenance requests.
 
-![Client interface](docs/client.png)
+![Client interface](engineer/client.png)
 
 ---
 
@@ -114,7 +114,7 @@ The client can view their profile, access only their own company’s data, and m
 
 The engineer can view assigned work, access equipment data, and manage repair-related tasks.
 
-![Engineer interface](docs/engineer.png)
+![Engineer interface](engineer/engineer.png)
 
 ---
 
@@ -123,7 +123,7 @@ The engineer can view assigned work, access equipment data, and manage repair-re
 The project was tracked with WakaTime. The statistics show tracked development time, main languages, editors, operating
 system, and work categories.
 
-![Development statistics](docs/stats.png)
+![Development statistics](engineer/stats.png)
 
 ---
 
@@ -178,25 +178,7 @@ Because this project was built without a framework, several standard backend mec
 ## Project Structure
 
 ```text
-EquipLane/
-├── app/
-│   ├── database/
-│   │   └── seed.php
-│   ├── helpers/
-│   ├── models/
-│   └── views/
-├── docs/
-│   ├── admin.png
-│   ├── client.png
-│   ├── engineer.png
-│   └── stats.png
-├── public/
-│   ├── index.php
-│   ├── tickets.php
-│   └── view_ticket.php
-├── database.sql
-├── .env.example
-└── README.md
+EquipLane/text EquipLane/ ├── app/ │ ├── auth/ │ │ ├── check.php │ │ └── csrf.php │ ├── database/ │ │ ├── db.php │ │ └── seed.php │ ├── bootstrap.php │ └── helpers.php ├── docs/ │ ├── admin.png │ ├── client.png │ ├── engineer.png │ └── stats.png ├── public/ │ ├── companies.php │ ├── create_ticket.php │ ├── equipment.php │ ├── export.php │ ├── index.php │ ├── login.php │ ├── logout.php │ ├── profile.php │ ├── tickets.php │ ├── users.php │ └── view_ticket.php ├── views/ │ ├── footer.php │ └── header.php ├── database.sql ├── LICENSE ├── ROADMAP.md ├── .env.example └── README.md
 ```
 
 ---
@@ -359,7 +341,3 @@ Possible improvements for future versions:
 * Add a public live demo deployment
 
 ---
-
-## License
-
-This project was created for educational and portfolio purposes.
