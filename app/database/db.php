@@ -15,5 +15,5 @@ $options = [
 try {
     $pdo = new PDO($dsn, $dbUser, $dbPassword, $options);
 } catch (PDOException $e) {
-    die("error -" . $e->getMessage() . " passwrd:[" . $dbPassword . "]");
+    die();
 }
