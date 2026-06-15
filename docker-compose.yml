@@ -10,14 +10,14 @@ services:
       - DB_PORT=3306
       - DB_NAME=equiplane
       - DB_USER=root
-      - DB_PASSWORD=112243
+      - DB_PASSWORD=root
     depends_on:
       - db
 
   db:
     image: mariadb:10.11
     environment:
-      - MYSQL_ROOT_PASSWORD=112243
+      - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=equiplane
     ports:
       - "3306:3306"
