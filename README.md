@@ -11,15 +11,15 @@
   <img src="https://img.shields.io/badge/Portfolio%20Project-F97316?style=for-the-badge" alt="Portfolio Project">
  <img src="https://img.shields.io/badge/Docker-2563EB?style=for-the-badge" alt="Docker">
 <img src="https://img.shields.io/badge/CI-22C55E?style=for-the-badge" alt="CI"></p>
-**EquipLane** is an industrial maintenance ticketing system built for manufacturing companies, field engineers, and
+EquipLane is an industrial maintenance ticketing system built for manufacturing companies, field engineers, and
 service administrators.
 
 The platform allows corporate clients to report equipment failures, engineers to manage assigned repair tasks, and
 administrators to oversee the full maintenance workflow: from registering companies and machinery to assigning engineers
 and calculating service costs.
 
-This is my first major portfolio project. I deliberately built it with **native PHP without using a full-stack framework
-** in order to better understand the core mechanics of backend web development: routing, session management, MVC-like
+This is my first major portfolio project. I deliberately built it with native PHP without using a full-stack framework
+ in order to better understand the core mechanics of backend web development: routing, session management, MVC-like
 structure, database relations, authentication, authorization, form handling, and application security.
 
 ---
