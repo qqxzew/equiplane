@@ -19,7 +19,7 @@ administrators to oversee the full maintenance workflow: from registering compan
 and calculating service costs.
 
 This is my first major portfolio project. I deliberately built it with native PHP without using a full-stack framework
- in order to better understand the core mechanics of backend web development: routing, session management, MVC-like
+in order to better understand the core mechanics of backend web development: routing, session management, MVC-like
 structure, database relations, authentication, authorization, form handling, and application security.
 
 ---
@@ -343,11 +343,8 @@ Possible improvements for future versions:
 - Add email notifications when ticket status changes
 - Add file uploads for equipment photos or repair documentation
 - Add audit logs for administrator actions
-- Add advanced search and filtering
-- Add export of financial reports
 - Improve responsive design for mobile devices
 - Replace CDN-based Tailwind CSS with a production build pipeline
-- Add a public live demo deployment
 
 ---
 
